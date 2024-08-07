@@ -1,0 +1,14 @@
+/bin/
+/lib/
+/share/
+*.pyc
+__pycache__/
+/data/
+env/
+venv/
+/results/
+.DS_Store
+../.DS_Store
+/include/
+/__pycache__/
+/tmp_trainer/

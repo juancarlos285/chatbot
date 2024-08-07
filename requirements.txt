@@ -1,0 +1,6 @@
+flask
+twilio
+openai
+langchain
+beautifulsoup4
+requests

@@ -1,0 +1,8 @@
+/bin/
+/lib/
+/share/
+*.pyc
+__pycache__/
+/data/properties_with_embeddings.csv
+env/
+venv/
