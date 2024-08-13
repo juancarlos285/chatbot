@@ -21,7 +21,7 @@ chat_history_for_chain = ChatMessageHistory()
 def query_llm(properties, user_message):
     # Define the prompt template
     template = """
-    Eres un asistente de bienes raíces experto en las propiedades: {properties}. 
+    Eres un asistente de bienes raíces experto en las propiedades: {properties}. Si las preguntas no son relacionadas con bienes raíces, limita tu respuesta a informar al usuario cuál es tu rol. 
 
     Tus tareas son:
 
