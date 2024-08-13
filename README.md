@@ -2,7 +2,9 @@
 
 ## Overview
 
-This project is a sophisticated chatbot designed to interact with users via WhatsApp, providing property information and handling user inquiries for a real estate business. The chatbot uses a combination of a BERT-based intent classifier and a Language Learning Model (LLM) to offer accurate and contextually aware responses.
+This project is a sophisticated chatbot designed to interact with users via WhatsApp, providing property information and handling user inquiries for a Latin American real estate company. The chatbot operates in Spanish, catering to the target audience's language needs. It uses a combination of a BERT-based intent classifier and a Language Learning Model (LLM) to offer accurate and contextually aware responses.
+
+WhatsApp is the preferred platform for this project because it is the most widely used communication app in Latin America, making it an ideal choice for reaching a broad audience.
 
 For those interested in a deeper dive into the technical details and development process of this project, a series of blog posts is available on [Medium](www.medium.com).
 
@@ -91,9 +93,7 @@ We welcome contributions to improve this chatbot. Please follow these steps:
    git commit -m "Description of changes"
    ```
 5. Push to your branch:
-   ```
-   bash
-   Copy code
+   ```bash
    git push origin feature-name
    ```
 6. Create a Pull Request for review.
