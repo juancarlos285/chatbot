@@ -16,7 +16,7 @@ For those interested in a deeper dive into the technical details and development
 
 ## Architecture
 
-![Architecture Diagram](path_to_your_diagram.png)
+![Architecture Diagram](architecture_diagram.png)
 
 The architecture includes:
 
