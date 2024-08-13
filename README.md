@@ -73,7 +73,7 @@ python run.py
 ### Usage
 - **Property Information:** Users can request details about properties by mentioning specific locations or features. For example, "How much is the house on Main Street?" will prompt the chatbot to provide relevant property details.
 
--**Contact Agent:** If a user expresses intent to contact a real estate agent or schedule a viewing, the chatbot will recognize this intent and provide a specific response, such as "En unos minutos, el agente inmobiliario se pondrá en contacto contigo. Gracias por contactar a Asesores Inmobiliarios."
+- **Contact Agent:** If a user expresses intent to contact a real estate agent or schedule a viewing, the chatbot will recognize this intent and provide a specific response, such as "En unos minutos, el agente inmobiliario se pondrá en contacto contigo. Gracias por contactar a Asesores Inmobiliarios."
 
 ### Contributing
 We welcome contributions to improve this chatbot. Please follow these steps:
