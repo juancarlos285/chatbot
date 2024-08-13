@@ -70,12 +70,12 @@ python run.py
    Send a message to the WhatsApp number connected to your Twilio account.
    The chatbot will respond based on the message content and intent.
 
-### Usage
+## Usage
 - **Property Information:** Users can request details about properties by mentioning specific locations or features. For example, "How much is the house on Main Street?" will prompt the chatbot to provide relevant property details.
 
 - **Contact Agent:** If a user expresses intent to contact a real estate agent or schedule a viewing, the chatbot will recognize this intent and provide a specific response, such as "En unos minutos, el agente inmobiliario se pondrá en contacto contigo. Gracias por contactar a Asesores Inmobiliarios."
 
-### Contributing
+## Contributing
 We welcome contributions to improve this chatbot. Please follow these steps:
 
 1. Fork the repository.
@@ -98,5 +98,5 @@ We welcome contributions to improve this chatbot. Please follow these steps:
    ```
 6. Create a Pull Request for review.
 
-### Contact
+## Contact
 For any inquiries, feel free to reach out via email: jcacosta285@gmail.com   
