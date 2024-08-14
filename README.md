@@ -58,8 +58,23 @@ The architecture includes:
    export TWILIO_ACCOUNT_SID='your-twilio-account-sid'
    export TWILIO_AUTH_TOKEN='your-twilio-auth-token'
    ```
+### Twilio Sandbox Setup (For Testing)
+1. Create a Twilio Sandbox for WhatsApp:
+   - Log in to your Twilio account and navigate to the [Twilio Sandbox for WhatsApp](https://www.twilio.com/docs/whatsapp/sandbox).
+   - Follow the instructions to activate the sandbox. Twilio will provide you with a phone number and a unique code for joining the sandbox.
 
-### Running the Application
+2. Add the Twilio Sandbox Phone Number:
+   - Update your environment variables or the configuration file with the Twilio sandbox phone number:
+   ```bash
+   export TWILIO_SANDBOX_NUMBER='whatsapp:+your-sandbox-number'
+   ```
+3. Join the Sandbox:
+   - To start testing, send a WhatsApp message containing the unique code provided by Twilio to the sandbox phone number. This will link your WhatsApp account to the sandbox.
+
+4. Interact with the Chatbot:
+   - Once you've joined the sandbox, you can send messages to the sandbox number from your WhatsApp account. The chatbot will respond based on the message content and intent.
+
+## Running the Application
 
 1. Run the Flask web server:
 ```bash
