@@ -36,7 +36,7 @@ def whatsapp_webhook():
         # Send the response using Twilio's REST API
         try:
             sent_message = client.messages.create(
-                from_='whatsapp:+14155238886',  # Your Twilio WhatsApp number
+                from_= config.TWILIO_SANDBOX_NUMBER,  # Your Twilio WhatsApp number
                 body=response_message,
                 to=from_number
             )
@@ -62,7 +62,7 @@ def whatsapp_webhook():
         # Send the response using Twilio's REST API
         try:
             sent_message = client.messages.create(
-                from_='whatsapp:+14155238886',  # Your Twilio WhatsApp number
+                from_= config.TWILIO_SANDBOX_NUMBER,  # Your Twilio WhatsApp number
                 body=llm_response,
                 to=from_number
             )
