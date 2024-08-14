@@ -58,6 +58,18 @@ The architecture includes:
    export TWILIO_ACCOUNT_SID='your-twilio-account-sid'
    export TWILIO_AUTH_TOKEN='your-twilio-auth-token'
    ```
+### Setting Up Large Files
+Due to size limitations, the data folder and the results folder (containing the fine-tuned model) are not included in this repository. To set up these files locally, please follow the steps below:
+
+**Step 1: Download the Required Files**
+1. Download the data folder:
+   - [Click here to download the data folder from Google Drive](https://drive.google.com/drive/folders/13Ctkh9Vl9TYa0rUBsKzv1o1eQsAQD67T?usp=drive_link)
+2. Download the results folder (fine-tuned model):
+   - [Click here to download the results folder from Google Drive](https://drive.google.com/drive/folders/1uL9potBo_IpR-A7dUTv6mccYfmJ5xc3V?usp=drive_link)
+
+**Step 2: Place the Files in the Project Directory**
+1. After downloading, place the folders in the root directory of the project.
+   
 ### Twilio Sandbox Setup (For Testing)
 1. Create a Twilio Sandbox for WhatsApp:
    - Log in to your Twilio account and navigate to the [Twilio Sandbox for WhatsApp](https://www.twilio.com/docs/whatsapp/sandbox).
