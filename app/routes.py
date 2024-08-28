@@ -2,7 +2,9 @@ from flask import Blueprint, request
 from twilio.rest import Client
 import sys
 import os
-from .utils import load_properties_with_embeddings, search_properties_with_embeddings, classify_intent
+import time
+import pandas as pd
+from .utils import load_properties_with_embeddings, search_properties_with_embeddings, classify_intent, send_message_to_agent, get_agent_info, get_property_for_agent
 from .langchain_ import query_llm
 
 # Add the parent directory to the sys.path
@@ -19,20 +21,37 @@ bp = Blueprint('routes', __name__)
 def home():
     return "Welcome to the WhatsApp bot server!"
 
+#Context dictionary to store user states
+user_context = {}
 
 @bp.route('/whatsapp', methods=['POST'])
 def whatsapp_webhook():
     incoming_msg = request.values.get('Body', '').lower()
     from_number = request.values.get('From', '')  # Get the sender's WhatsApp number
-    print(f"----Incoming message: {incoming_msg} from {from_number}----")  # Debugging line
+    print(f"----Incoming message: {incoming_msg} from {from_number}----")
 
-    # Classify intent of incoming message
-    intent = classify_intent(incoming_msg)
-    print(f"----INTENT:{intent}----")
+    # Check if the user is in 'expecting property id' context
+    if user_context.get(from_number) == 'awaiting_property_id':
+        # Process the property ID
+        try:
+            property_id = incoming_msg.strip()
+            property_info = get_property_for_agent(property_id)
+            agent_info = get_agent_info(property_id)
+            if agent_info:
+                # Notify the agent with customer details
+                agent_message = (f"Un cliente con el número {from_number} ha solicitado información sobre la propiedad en {property_info['location'].values[0]}\n{property_info['neighborhood'].values[0]}. "
+                                 "Por favor, contacta al cliente para más detalles.")
+                send_message_to_agent(agent_info['phone_number'], agent_message)
+                time.sleep(5)
+                response_message = "Gracias. Hemos notificado al agente. Se pondrán en contacto contigo pronto."
+            else:
+                response_message = "Lo siento, no pude encontrar un agente asociado a ese ID de propiedad. Por favor verifica el ID."
+        except ValueError:
+            response_message = "Parece que el ID de propiedad proporcionado no es válido. Por favor intenta de nuevo con un número válido."
 
-    # Prepare the response based on the classified intent
-    if intent == 'contact agent':
-        response_message = "En unos minutos, el agente inmobiliario se pondrá en contacto contigo. Gracias por contactar a Asesores Inmobiliarios."
+        # Reset the user's context
+        user_context[from_number] = None
+
         # Send the response using Twilio's REST API
         try:
             sent_message = client.messages.create(
@@ -40,40 +59,59 @@ def whatsapp_webhook():
                 body=response_message,
                 to=from_number
             )
-            print(f"Message sent with SID: {sent_message.sid}")  # Debugging line
+            print(f"Message sent with SID: {sent_message.sid}")
         except Exception as e:
-            print(f"Failed to send message: {e}")  # Debugging line
+            print(f"Failed to send message: {e}") 
 
         return sent_message.body
-    else: 
-        # Load properties with embeddings
-        properties_df = load_properties_with_embeddings()
+    
+    else:
+        # Classify intent of incoming message
+        intent = classify_intent(incoming_msg)
+        print(f"----INTENT:{intent}----")
 
-        # Search for relevant properties using embeddings
-        relevant_properties_df = search_properties_with_embeddings(properties_df, incoming_msg)
+        # Prepare the response based on the classified intent
+        if intent == 'contact agent':
+            response_message = ("En unos minutos, el agente inmobiliario se pondrá en contacto contigo. "
+                                "Por favor, envíanos el número de ID de la propiedad que deseas visitar para confirmar la solicitud.")
+            # Set context to awaiting_property_id for this user
+            user_context[from_number] = 'awaiting_property_id'
 
-        # Convert relevant properties to a string for the LLM
-        relevant_properties_str = relevant_properties_df['property_string'].to_json()
+            # Send the response using Twilio's REST API
+            try:
+                sent_message = client.messages.create(
+                    from_= config.TWILIO_SANDBOX_NUMBER,  # Your Twilio WhatsApp number
+                    body=response_message,
+                    to=from_number
+                )
+                print(f"Message sent with SID: {sent_message.sid}")  # Debugging line
+            except Exception as e:
+                print(f"Failed to send message: {e}")  # Debugging line
 
-        #Query the LLM
-        llm_response = query_llm(properties=relevant_properties_str, user_message=incoming_msg)
-        print(f"LLM response: {llm_response}")
+            return sent_message.body
+        else: 
+            # Load properties with embeddings
+            properties_df = load_properties_with_embeddings()
 
-        # Send the response using Twilio's REST API
-        try:
-            sent_message = client.messages.create(
-                from_= config.TWILIO_SANDBOX_NUMBER,  # Your Twilio WhatsApp number
-                body=llm_response,
-                to=from_number
-            )
-            print(f"Message sent with SID: {sent_message.sid}")  # Debugging line
-        except Exception as e:
-            print(f"Failed to send message: {e}")  # Debugging line
+            # Search for relevant properties using embeddings
+            relevant_properties_df = search_properties_with_embeddings(properties_df, incoming_msg)
 
-        return sent_message.body 
+            # Convert relevant properties to a string for the LLM
+            relevant_properties_str = relevant_properties_df['property_string'].to_json()
 
-# if __name__ == "__main__":
-# #     #test chat history
-#     test_query = "Tiene propiedades en la urbanizacion san rafael?"
-#     properties_df = load_properties_with_embeddings()
-#     print(search_properties_with_embeddings(properties_df, test_query))
+            #Query the LLM
+            llm_response = query_llm(properties=relevant_properties_str, user_message=incoming_msg)
+            print(f"LLM response: {llm_response}")
+
+            # Send the response using Twilio's REST API
+            try:
+                sent_message = client.messages.create(
+                    from_= config.TWILIO_SANDBOX_NUMBER,  # Your Twilio WhatsApp number
+                    body=llm_response,
+                    to=from_number
+                )
+                print(f"Message sent with SID: {sent_message.sid}")  # Debugging line
+            except Exception as e:
+                print(f"Failed to send message: {e}")  # Debugging line
+
+            return sent_message.body 

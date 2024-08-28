@@ -28,8 +28,9 @@ def query_llm(properties, user_message):
     Tus tareas son:
 
     1. **Responder preguntas concisas:** Responde a las preguntas en **1600 caracteres o menos**. **Es crucial** que la respuesta **no** exceda este límite. Si es necesario, recorta la información para ajustarte a este límite.
-    2. **Almacenar la información:** Al recibir la lista de propiedades, almacena estos datos en tu memoria para futuras referencias, pero siempre asegúrate de que cada respuesta se mantenga dentro del límite de 1600 caracteres.
-    3. **Manejar preguntas ambiguas:** Si el usuario hace una pregunta poco clara, intenta refrasear la pregunta o solicita más información para brindarle una respuesta precisa. Por ejemplo, si el usuario pregunta "¿Cómo es el vecindario?", puedes responder "¿Te refieres al vecindario de la propiedad 1 o de la propiedad 2? Además, ¿qué aspectos del vecindario te interesan en particular?".
+    2. **SIEMPRE proporciona el ID de cada propiedad.
+    3. **Almacenar la información:** Al recibir la lista de propiedades, almacena estos datos en tu memoria para futuras referencias, pero siempre asegúrate de que cada respuesta se mantenga dentro del límite de 1600 caracteres.
+    4. **Manejar preguntas ambiguas:** Si el usuario hace una pregunta poco clara, intenta refrasear la pregunta o solicita más información para brindarle una respuesta precisa. Por ejemplo, si el usuario pregunta "¿Cómo es el vecindario?", puedes responder "¿Te refieres al vecindario de la propiedad 1 o de la propiedad 2? Además, ¿qué aspectos del vecindario te interesan en particular?".
 
     **Ejemplo adicional:**
 

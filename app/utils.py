@@ -14,6 +14,7 @@ from sentence_transformers import SentenceTransformer
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from langchain_community.embeddings import OpenAIEmbeddings
+from twilio.rest import Client
 import nltk
 from nltk.corpus import stopwords
 nltk.download('stopwords')
@@ -253,6 +254,7 @@ def property_to_string(property):
             Parqueaderos: {property['parking_spots']}
             Descripción: {property['description']}
             Enlace: {property['url']}
+            ID: {property['id']}
             """
 
 def get_embeddings(texts):
@@ -283,9 +285,6 @@ def save_properties_to_csv(properties, file_name):
     output_file_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', file_name))
     df.to_csv(output_file_path, index=False)
 
-# properties = property_data()
-# save_properties_to_csv(properties, 'openai_embeddings.csv')
-
 def search_properties_with_embeddings(properties_df, query):
     query_embedding = np.array(openai_embeddings([query])).reshape(1, -1)
     property_embeddings = np.stack(properties_df['embedding'].values)
@@ -298,6 +297,35 @@ def search_properties_with_embeddings(properties_df, query):
 #Load properties to generate embeddings and save to CSV
 # properties = property_data()
 # save_properties_to_csv(properties, 'properties_with_embeddings.csv')
+
+# Load agent information
+def load_agent_data():
+    with open('data/agent_data.json', 'r') as f:
+        return json.load(f)
+
+# Get agent information based on property ID
+def get_agent_info(property_id):
+    agents = load_agent_data()
+    return agents[property_id]
+
+#Get property info for the agent based on the id provided by the client
+def get_property_for_agent(id:str):
+    properties = pd.read_json('data/property_listings.json')
+    retrieved_property = properties[properties['id'] == int(id)]
+    return retrieved_property
+
+# Send a message to the agent with the customer's details
+def send_message_to_agent(agent_phone_number, message):
+    client = Client(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN)
+    try:
+        sent_message = client.messages.create(
+            from_= config.TWILIO_SANDBOX_NUMBER,  # Your Twilio WhatsApp number
+            body=message,
+            to=f'whatsapp:{agent_phone_number}'
+        )
+        print(f"Message sent to agent with SID: {sent_message.sid}") 
+    except Exception as e:
+        print(f"Failed to send message to agent: {e}")  
 
 #----Intent Classification----
 model_path = './results/checkpoint-126'  
