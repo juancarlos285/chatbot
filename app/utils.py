@@ -328,7 +328,7 @@ def send_message_to_agent(agent_phone_number, message):
         print(f"Failed to send message to agent: {e}")  
 
 #----Intent Classification----
-model_path = './results/checkpoint-126'  
+model_path = './results/checkpoint-210'  
 model = AutoModelForSequenceClassification.from_pretrained(model_path)
 tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 def classify_intent(text):

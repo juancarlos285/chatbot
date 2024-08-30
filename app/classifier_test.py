@@ -18,7 +18,7 @@ test_df['query'] = test_df['query'].map(clean_text)
 test_dataset = Dataset.from_pandas(test_df)
 
 # Step 2: Load the Trained Model and Tokenizer
-model_path = './results/checkpoint-126'  
+model_path = './results/checkpoint-210'  
 model = AutoModelForSequenceClassification.from_pretrained(model_path)
 tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 
@@ -46,6 +46,16 @@ true_labels = test_dataset['label']
 # Calculate accuracy, precision, recall, and F1 score
 accuracy = accuracy_score(true_labels, predicted_labels)
 precision, recall, f1, _ = precision_recall_fscore_support(true_labels, predicted_labels, average='weighted')
+
+# Find indices where predictions do not match true labels
+misclassified_indices = [i for i in range(len(true_labels)) if true_labels[i] != predicted_labels[i]]
+
+# Step 6: Extract Mislabeled Data Points
+misclassified_df = test_df.loc[misclassified_indices, :]
+misclassified_df['predicted_label'] = predicted_labels[misclassified_indices]
+
+# Step 7: Display or Save the Mislabeled Data Points
+print(misclassified_df[['query', 'label', 'predicted_label']])
 
 # Print the evaluation metrics
 print(f"Accuracy: {accuracy:.4f}")

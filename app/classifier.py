@@ -11,8 +11,8 @@ torch.mps.empty_cache()
 dataset = pd.read_csv('data/contact_agent_dataset.csv')
 
 #Turn labels to numerical values and clean text
-label_mapping = {' contact agent': 0, ' other': 1}
-dataset[' label'] = dataset[' label'].map(label_mapping)
+label_mapping = {'contact agent': 0, 'other': 1}
+dataset['label'] = dataset['label'].map(label_mapping)
 dataset['query'] = dataset['query'].map(clean_text)
 
 # Split the dataset into train and test sets
@@ -30,7 +30,7 @@ def preprocess_function(examples):
     # Tokenize the text
     inputs = tokenizer(examples['query'], padding='max_length', truncation=True, max_length=50)
     # Add the labels
-    inputs['labels'] = examples[' label']
+    inputs['labels'] = examples['label']
     return inputs
 
 # Apply the preprocessing to the datasets

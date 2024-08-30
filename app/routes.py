@@ -97,7 +97,7 @@ def whatsapp_webhook():
             relevant_properties_df = search_properties_with_embeddings(properties_df, incoming_msg)
 
             # Convert relevant properties to a string for the LLM
-            relevant_properties_str = relevant_properties_df['property_string'].to_json()
+            relevant_properties_str = "\n\n".join(relevant_properties_df['property_string'].values)
 
             #Query the LLM
             llm_response = query_llm(properties=relevant_properties_str, user_message=incoming_msg)
