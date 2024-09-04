@@ -35,11 +35,11 @@ def whatsapp_webhook():
         # Process the property ID
         try:
             property_id = incoming_msg.strip()
-            property_info = get_property_for_agent(property_id)
+            location, neighborhood = get_property_for_agent(property_id)
             agent_info = get_agent_info(property_id)
             if agent_info:
                 # Notify the agent with customer details
-                agent_message = (f"Un cliente con el número {from_number} ha solicitado información sobre la propiedad en {property_info['location'].values[0]}\n{property_info['neighborhood'].values[0]}. "
+                agent_message = (f"Un cliente con el número {from_number} ha solicitado información sobre la propiedad en {location}\n{neighborhood}. "
                                  "Por favor, contacta al cliente para más detalles.")
                 send_message_to_agent(agent_info['phone_number'], agent_message)
                 time.sleep(5)

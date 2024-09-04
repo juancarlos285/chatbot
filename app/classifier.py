@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 from datasets import Dataset
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer, TrainingArguments, EarlyStoppingCallback
 import torch
+import json
 
 torch.mps.empty_cache()
 
@@ -51,17 +52,20 @@ model.classifier.dropout = torch.nn.Dropout(p=0.3)  # Increase dropout probabili
 training_args = TrainingArguments(
     output_dir='./results',
     eval_strategy='steps',
-    eval_steps=10,
+    eval_steps=20,
     save_strategy='steps',
-    learning_rate=2e-5,
+    learning_rate=5e-6,
     lr_scheduler_type='linear',
-    num_train_epochs=3,
+    warmup_steps=50,
+    num_train_epochs=5,
     weight_decay=0.05,
-    per_device_train_batch_size=4,
-    per_device_eval_batch_size=4,
+    per_device_train_batch_size=8,
+    per_device_eval_batch_size=8,
     logging_dir='./logs',
-    logging_steps=10,
-    load_best_model_at_end=True
+    logging_steps=20,
+    load_best_model_at_end=True,
+    metric_for_best_model='eval_loss',
+    greater_is_better=False
 )
 
 # Define the trainer
@@ -70,7 +74,7 @@ trainer = Trainer(
     args=training_args,
     train_dataset=train_dataset,
     eval_dataset=test_dataset,
-    callbacks = [EarlyStoppingCallback(early_stopping_patience=3)]
+    callbacks = [EarlyStoppingCallback(early_stopping_patience=2)]
 )
 
 # Train the model
@@ -80,10 +84,13 @@ trainer.train()
 results = trainer.evaluate()
 print(results)
 
-def classify_intent(text):
-    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
-    with torch.no_grad():
-        outputs = model(**inputs)
-    logits = outputs.logits
-    predicted_class_id = logits.argmax().item()
-    return 'contact agent' if predicted_class_id == 0 else 'other'
+# Save model
+model_folder = './results/model-6'
+trainer.save_model(model_folder)
+
+# Save the training history to a JSON file
+log_history = trainer.state.log_history
+log_history_file = model_folder + '/log_history.json'
+
+with open(log_history_file, 'w') as f:
+    json.dump(log_history, f, indent=4)

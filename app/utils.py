@@ -309,10 +309,12 @@ def get_agent_info(property_id):
     return agents[property_id]
 
 #Get property info for the agent based on the id provided by the client
-def get_property_for_agent(id:str):
+def get_property_for_agent(id):
     properties = pd.read_json('data/property_listings.json')
     retrieved_property = properties[properties['id'] == int(id)]
-    return retrieved_property
+    location = retrieved_property['location'].values[0]
+    neighborhood = retrieved_property['neighborhood'].values[0]
+    return (location, neighborhood)
 
 # Send a message to the agent with the customer's details
 def send_message_to_agent(agent_phone_number, message):
@@ -328,7 +330,7 @@ def send_message_to_agent(agent_phone_number, message):
         print(f"Failed to send message to agent: {e}")  
 
 #----Intent Classification----
-model_path = './results/checkpoint-210'  
+model_path = './results/model-6'  
 model = AutoModelForSequenceClassification.from_pretrained(model_path)
 tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 def classify_intent(text):

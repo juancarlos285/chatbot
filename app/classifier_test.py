@@ -6,7 +6,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trai
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
 # Step 1: Load the Test Dataset
-test_dataset_path = './data/test_contact_agent.csv'
+test_dataset_path = './data/price_queries.csv'
 test_df = pd.read_csv(test_dataset_path)
 
 # Map string labels to numerical values and clean text
@@ -18,7 +18,7 @@ test_df['query'] = test_df['query'].map(clean_text)
 test_dataset = Dataset.from_pandas(test_df)
 
 # Step 2: Load the Trained Model and Tokenizer
-model_path = './results/checkpoint-210'  
+model_path = './results/model-6'  
 model = AutoModelForSequenceClassification.from_pretrained(model_path)
 tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 
@@ -30,7 +30,6 @@ test_dataset = test_dataset.map(preprocess_function, batched=True)
 test_dataset.set_format(type='torch', columns=['input_ids', 'attention_mask', 'label'])
 
 # Step 4: Make Predictions and Evaluate
-# Define the Trainer with the model and no training arguments (only for prediction)
 trainer = Trainer(model=model)
 
 # Make predictions
