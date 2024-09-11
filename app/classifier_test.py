@@ -1,7 +1,6 @@
 import pandas as pd
 from datasets import Dataset
 from utils import clean_text
-import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, Trainer
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 
