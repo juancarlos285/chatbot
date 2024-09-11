@@ -26,10 +26,26 @@ user_context = {}
 
 @bp.route('/whatsapp', methods=['POST'])
 def whatsapp_webhook():
-    incoming_msg = request.values.get('Body', '').lower()
+    incoming_msg = request.values.get('Body', '').strip().lower()
     from_number = request.values.get('From', '')  # Get the sender's WhatsApp number
     print(f"----Incoming message: {incoming_msg} from {from_number}----")
 
+    # Check if the user wants to cancel the current state
+    if from_number in user_context and user_context[from_number] == 'awaiting_property_id':
+        if incoming_msg == 'cancelar':
+            user_context.pop(from_number, None)
+            response_message = "La solicitud ha sido cancelada. Puedes continuar chateando normalmente."
+            try:
+                sent_message = client.messages.create(
+                    from_= config.TWILIO_SANDBOX_NUMBER,  # Your Twilio WhatsApp number
+                    body=response_message,
+                    to=from_number
+                )
+                print(f"Message sent with SID: {sent_message.sid}")
+            except Exception as e:
+                print(f"Failed to send message: {e}") 
+            return sent_message.body
+        
     # Check if the user is in 'expecting property id' context
     if user_context.get(from_number) == 'awaiting_property_id':
         # Process the property ID
@@ -72,8 +88,9 @@ def whatsapp_webhook():
 
         # Prepare the response based on the classified intent
         if intent == 'contact agent':
-            response_message = ("En unos minutos, el agente inmobiliario se pondrá en contacto contigo. "
-                                "Por favor, envíanos el número de ID de la propiedad que deseas visitar para confirmar la solicitud.")
+            response_message = ("En unos minutos, el agente inmobiliario se pondrá en contacto contigo.\n"
+                                "Por favor, envíanos el número de ID de la propiedad que deseas visitar para confirmar la solicitud.\n"
+                                "Si deseas cancelar esta solicitud y continuar chateando, escribe 'cancelar'.")
             # Set context to awaiting_property_id for this user
             user_context[from_number] = 'awaiting_property_id'
 
@@ -84,9 +101,9 @@ def whatsapp_webhook():
                     body=response_message,
                     to=from_number
                 )
-                print(f"Message sent with SID: {sent_message.sid}")  # Debugging line
+                print(f"Message sent with SID: {sent_message.sid}") 
             except Exception as e:
-                print(f"Failed to send message: {e}")  # Debugging line
+                print(f"Failed to send message: {e}")
 
             return sent_message.body
         else: 
