@@ -10,25 +10,26 @@ For those interested in a deeper dive into the technical details and development
 
 ## Features
 
-- **WhatsApp Integration**: Utilizes Twilio API to handle messaging through WhatsApp.
-- **Intent Classification**: Implements a BERT-based model to classify user intents, such as contacting an agent or requesting property details.
-- **Context Management**: Uses LangChain's `ChatMessageHistory` to keep track of conversation context, ensuring accurate and relevant responses.
-- **Dynamic and Predefined Responses**: Based on the user's intent, the bot can provide dynamic LLM-generated responses or predefined messages.
-- **Property Data Integration**: Retrieves and processes property details stored in JSON format, allowing the bot to deliver detailed information on demand.
+- **WhatsApp Integration:** Uses the Twilio API to integrate WhatsApp messaging for direct communication with users.
+- **Flask Backend:** The application is built on a Flask server, which manages interactions between the user and the chatbot.
+- **BERT Intent Classification:** A fine-tuned BERT model is used to classify user messages into different intents, such as inquiring about properties or contacting an agent.
+- **Context Management:** The chatbot keeps track of user interactions, allowing for multi-step conversations where users can inquire about multiple properties and contact agents.
+- **Vector Database:** Property information is stored in a vector database and embedded for efficient retrieval. This allows the chatbot to quickly search and retrieve relevant property details based on user input.
+- **LangChain Integration:** LangChain is used to handle the language model's interaction, generating dynamic responses based on user queries.
 
 ## Architecture
 
-![Architecture Diagram](architecture_diagram.png)
+![Architecture Diagram](chatbot_architecture.jpg)
 
 The architecture includes:
 
-- **User (WhatsApp)**: The entry point where users interact with the chatbot.
-- **Twilio API**: Facilitates the connection between WhatsApp and the Flask web server.
-- **Flask Web Server**: The backend server handling incoming messages and processing responses.
-- **BERT Intent Classifier**: Classifies the user's message into intents such as "contact agent" or "other."
-- **LLM (LangChain)**: Generates responses based on the conversation context.
-- **ChatMessageHistory**: Maintains the conversation history to provide context-aware responses.
-- **Property Data (JSON)**: The dataset containing detailed property information.
+- **User (WhatsApp):** The entry point where users interact with the chatbot.
+- **Twilio API:** Facilitates the connection between WhatsApp and the Flask web server.
+- **Flask Web Server:** The backend server handling incoming messages and processing responses.
+- **BERT Intent Classifier:** Classifies the user's message into intents such as "contact agent" or "other."
+- **LLM (LangChain):** Handles interactions between the language model and the property database, ensuring accurate and context-aware responses.
+- **ChatMessageHistory:** Maintains the conversation history to provide context-aware responses.
+- **Property Data (JSON):** Property data and agent information are stored in JSON format for easy access and manipulation.
 
 ## Setup and Installation
 
@@ -57,6 +58,7 @@ The architecture includes:
    export OPENAI_API_KEY='your-openai-api-key'
    export TWILIO_ACCOUNT_SID='your-twilio-account-sid'
    export TWILIO_AUTH_TOKEN='your-twilio-auth-token'
+   export TWILIO_SANDBOX_NUMBER='your-twilio-whatsapp-sandbox-number'
    ```
 ### Setting Up Large Files
 Due to size limitations, the data folder and the results folder (containing the fine-tuned model) are not included in this repository. To set up these files locally, please follow the steps below:
