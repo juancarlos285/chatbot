@@ -93,14 +93,11 @@ def whatsapp_webhook():
             # Load properties with embeddings
             properties_df = load_properties_with_embeddings()
 
-            # Search for relevant properties using embeddings
-            relevant_properties_df = search_properties_with_embeddings(properties_df, incoming_msg)
-
-            # Convert relevant properties to a string for the LLM
-            relevant_properties_str = "\n\n".join(relevant_properties_df['property_string'].values)
+            # Search for relevant properties using embeddings and return a list of them
+            relevant_properties = search_properties_with_embeddings(properties_df, incoming_msg)['property_string'].values
 
             #Query the LLM
-            llm_response = query_llm(properties=relevant_properties_str, user_message=incoming_msg)
+            llm_response = query_llm(properties=relevant_properties, input=incoming_msg, session_id=from_number)
             print(f"LLM response: {llm_response}")
 
             # Send the response using Twilio's REST API
