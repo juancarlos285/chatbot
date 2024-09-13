@@ -13,6 +13,7 @@ def create_app():
     with app.app_context():
         # Import and register the routes blueprint
         from .routes import bp as routes_bp
+
         app.register_blueprint(routes_bp)
 
     # Return the Flask application instance

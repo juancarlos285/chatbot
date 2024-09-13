@@ -60,7 +60,7 @@ model = AutoModelForSequenceClassification.from_pretrained(
 )
 
 # Add dropout layers
-model.classifier.dropout = torch.nn.Dropout(p=0.3) 
+model.classifier.dropout = torch.nn.Dropout(p=0.3)
 
 # Define training arguments
 training_args = TrainingArguments(

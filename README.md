@@ -6,7 +6,7 @@ This project is a sophisticated chatbot designed to interact with users via What
 
 WhatsApp is the preferred platform for this project because it is the most widely used communication app in Latin America, making it an ideal choice for reaching a broad audience.
 
-For those interested in a deeper dive into the technical details and development process of this project, a series of blog posts is available on [Medium](www.medium.com).
+For those interested in a deeper dive into the technical details and development process of this project, a series of blog posts is available on [Medium](https://medium.com/@jcacosta285/how-to-build-a-whatsapp-real-estate-chatbot-using-twilio-flask-and-ai-project-overview-53bf0b7d3f50).
 
 ## Features
 
