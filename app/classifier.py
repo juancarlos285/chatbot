@@ -58,7 +58,9 @@ test_dataset.set_format(type="torch", columns=["input_ids", "attention_mask", "l
 model = AutoModelForSequenceClassification.from_pretrained(
     "roberta-base", num_labels=2, ignore_mismatched_sizes=True
 )
-model.classifier.dropout = torch.nn.Dropout(p=0.3)  # Increase dropout probability
+
+# Add dropout layers
+model.classifier.dropout = torch.nn.Dropout(p=0.3) 
 
 # Define training arguments
 training_args = TrainingArguments(

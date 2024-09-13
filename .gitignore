@@ -12,3 +12,5 @@ venv/
 /include/
 /__pycache__/
 /tmp_trainer/
+.env
+/app/scraper.py

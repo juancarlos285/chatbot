@@ -1,9 +1,4 @@
-import requests
-from bs4 import BeautifulSoup
-from fake_useragent import UserAgent
 import re
-import random
-import time
 import json
 import os
 import sys
@@ -12,7 +7,7 @@ import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
-from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from twilio.rest import Client
 import nltk
 from nltk.corpus import stopwords
@@ -24,167 +19,6 @@ stop_words = set(stopwords.words("spanish"))
 # Add the parent directory to the sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import config
-
-
-def save_data_to_json(data, filename):
-    # Construct the path to the data folder at the same level as the app folder
-    project_root = os.path.dirname(os.path.dirname(__file__))
-    data_folder = os.path.join(project_root, "data")
-    os.makedirs(data_folder, exist_ok=True)
-    filepath = os.path.join(data_folder, filename)
-    with open(filepath, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
-    print(f"Data saved to {filepath}")
-
-
-def get_property_listings():
-    base_url = "https://www.plusvalia.com/inmobiliarias/asesores-inmobiliarios_51288661-inmuebles"
-
-    properties = []
-    previous_listings = set()
-    scraped_urls = set()
-    page = 1
-
-    # Generate new Session with randomized user agent
-    session = requests.Session()
-    ua = UserAgent()
-    headers = {"User-Agent": ua.random}
-    session.headers.update(headers)
-
-    while True:
-        if page == 1:
-            url = f"{base_url}.html"
-        else:
-            url = f"{base_url}-pagina-{page}.html"
-        try:
-            response = session.get(url)
-            if response.status_code == 403:
-                print(f"403 Forbidden error on page {page}. Retrying after delay.")
-                time.sleep(
-                    random.uniform(5, 10)
-                )  # Random delay between 5 and 10 seconds
-                continue  # Retry the same page
-            response.raise_for_status()
-
-            if url in scraped_urls:
-                print(f"URL {url} has already been scraped. Skipping.")
-                page += 1
-                scraped_urls.add(url)
-                continue
-
-            soup = BeautifulSoup(response.text, "html.parser")
-
-            # Find the main container that holds all the postings
-            postings_container = soup.find("div", class_="postings-container")
-            if not postings_container:
-                print(
-                    f"No postings container found on page {page}. Stopping the scraper."
-                )
-                break
-
-            # Find all individual listings within the main container
-            listings = postings_container.find_all(
-                "div", class_="CardContainer-sc-1tt2vbg-5 fvuHxG"
-            )
-
-            if not listings:
-                print(f"No listings found on page {page}. Stopping the scraper.")
-                break
-
-            # Check if the listings are the same as the previous page (to detect the end)
-            current_listings = set(listing.get_text() for listing in listings)
-            if current_listings == previous_listings:
-                print(f"Same listings found on page {page}. Assuming end of listings.")
-                break
-
-            # Update the previous listings
-            previous_listings = current_listings
-
-            # Debugging: Print the number of listings found
-            print(f"Found {len(listings)} listings on page {page}")
-
-            for listing in listings:
-                # Extract location
-                location_div = listing.find(
-                    "div", class_=re.compile(r"LocationAddress.*postingAddress")
-                )
-                location = location_div.text.strip() if location_div else "N/A"
-
-                # Extract neighborhood
-                neighborhood_h2 = listing.find(
-                    "h2", class_=re.compile(r"LocationLocation-sc-ge2uzh-2 fziprF")
-                )
-                neighborhood = (
-                    neighborhood_h2.text.strip() if neighborhood_h2 else "N/A"
-                )
-
-                # Extract main features (area, bedrooms, bathrooms, parking spots)
-                features_h3 = listing.find(
-                    "h3", class_="PostingMainFeaturesBlock-sc-1uhtbxc-0 cHDgeO"
-                )
-                if features_h3:
-                    spans = features_h3.find_all("span")
-                    area = spans[0].text.strip() if len(spans) > 0 else "N/A"
-                    bedrooms = spans[1].text.strip() if len(spans) > 1 else "N/A"
-                    bathrooms = spans[2].text.strip() if len(spans) > 2 else "N/A"
-                    parking_spots = spans[3].text.strip() if len(spans) > 3 else "N/A"
-                else:
-                    area = bedrooms = bathrooms = parking_spots = "N/A"
-
-                # Extract price
-                price_div = listing.find(
-                    "div", class_=re.compile(r"Price-sc-12dh9kl-3 geYYII")
-                )
-                price = price_div.text.strip() if price_div else "N/A"
-
-                # Extract fee
-                fee_div = listing.find(
-                    "div", class_=re.compile(r"Expenses-sc-12dh9kl-1 iboaIF")
-                )
-                fee = fee_div.text.strip() if fee_div else "N/A"
-
-                # Extract description
-                description_h3 = listing.find(
-                    "h3", class_="PostingDescription-sc-i1odl-11 fECErU"
-                )
-                description = (
-                    description_h3.find("a").text.strip() if description_h3 else "N/A"
-                )
-
-                # Extract property link
-                property_link = (
-                    description_h3.find("a")["href"] if description_h3 else "N/A"
-                )
-
-                # Store the details in a dictionary
-                property_details = {
-                    "page": page,
-                    "location": location,
-                    "neighborhood": neighborhood,
-                    "area": area,
-                    "price": price,
-                    "fee": fee,
-                    "bedrooms": bedrooms,
-                    "bathrooms": bathrooms,
-                    "parking_spots": parking_spots,
-                    "description": description,
-                    "url": "plusvalia.com" + property_link,
-                }
-                properties.append(property_details)
-        except requests.exceptions.RequestException as e:
-            print(f"Error fetching property listings from {url}: {e}")
-            break
-
-        # Add a random delay between requests to avoid rate limiting
-        time.sleep(random.uniform(1, 3))  # Random delay between 1 and 3 seconds
-        page += 1
-
-    return properties
-
-
-# ----Use when retrieving properties from plusvalia.com-----
-# properties = get_property_listings()
-# save_data_to_json(properties, 'property_listings.json')
 
 
 def property_data():
@@ -293,12 +127,10 @@ def save_properties_to_csv(properties, file_name):
     ]
     property_embeddings = openai_embeddings(property_embeddings)
 
-    # Create DataFrame
     df = pd.DataFrame(
         {"property_string": property_strings, "embedding": property_embeddings}
     )
 
-    # Save to CSV
     output_file_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "data", file_name)
     )

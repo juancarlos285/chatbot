@@ -6,3 +6,5 @@ __pycache__/
 /data/properties_with_embeddings.csv
 env/
 venv/
+.env
+/app/scraper.py
